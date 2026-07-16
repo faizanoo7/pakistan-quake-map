@@ -10,7 +10,7 @@ import {
 } from "react-leaflet";
 import type { LatLngBoundsExpression } from "leaflet";
 import "@/lib/leaflet-setup";
-import type { QuakeCollection, Timeframe } from "@/lib/types";
+import type { QuakeCollection } from "@/lib/types";
 import { radiusForMagnitude, colorForMagnitude } from "@/lib/quake-style";
 
 const PAKISTAN_BOUNDS: LatLngBoundsExpression = [
@@ -18,20 +18,13 @@ const PAKISTAN_BOUNDS: LatLngBoundsExpression = [
   [37.5, 77.5],
 ];
 
-const TIMEFRAME_FILES: Record<Timeframe, string> = {
-  "30d": "/data/quakes_30d.geojson",
-  "5y": "/data/quakes_5y.geojson",
-  "50y": "/data/quakes_50y.geojson",
-};
-
 interface Props {
-  timeframe: Timeframe;
+  quakes: QuakeCollection | null;
+  loading: boolean;
 }
 
-export default function QuakeMap({ timeframe }: Props) {
-  const [quakes, setQuakes] = useState<QuakeCollection | null>(null);
+export default function QuakeMap({ quakes, loading }: Props) {
   const [districts, setDistricts] = useState<GeoJSON.GeoJsonObject | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/data/districts.geojson")
@@ -39,20 +32,6 @@ export default function QuakeMap({ timeframe }: Props) {
       .then(setDistricts)
       .catch((err) => console.error("Failed to load districts:", err));
   }, []);
-
-  useEffect(() => {
-    setLoading(true);
-    fetch(TIMEFRAME_FILES[timeframe])
-      .then((r) => r.json())
-      .then((data: QuakeCollection) => {
-        setQuakes(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Failed to load quakes:", err);
-        setLoading(false);
-      });
-  }, [timeframe]);
 
   const renderLink = (url: string | null) => {
     if (!url) return null;
