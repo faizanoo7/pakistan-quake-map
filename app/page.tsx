@@ -1,65 +1,60 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import dynamic from "next/dynamic";
+import type { Timeframe } from "@/lib/types";
+import TimeframeToggle from "@/components/TimeframeToggle";
+
+// Load the map only in the browser — Leaflet touches window/document
+const QuakeMap = dynamic(() => import("@/components/QuakeMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center text-slate-500">
+      Loading map…
+    </div>
+  ),
+});
 
 export default function Home() {
+  const [timeframe, setTimeframe] = useState<Timeframe>("5y");
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="relative h-screen w-screen overflow-hidden">
+      <QuakeMap timeframe={timeframe} />
+      <TimeframeToggle value={timeframe} onChange={setTimeframe} />
+
+      {/* Header */}
+      <div className="absolute top-4 right-4 z-[1000] rounded-lg bg-white/95 px-4 py-2 shadow-lg backdrop-blur">
+        <h1 className="text-lg font-bold text-slate-900">
+          Pakistan Earthquake Explorer
+        </h1>
+        <p className="text-xs text-slate-500">
+          USGS data · updated daily
+        </p>
+      </div>
+
+      {/* Legend */}
+      <div className="absolute bottom-4 left-4 z-[1000] rounded-lg bg-white/95 p-3 text-xs shadow-lg backdrop-blur">
+        <div className="mb-2 font-semibold text-slate-700">Magnitude</div>
+        <div className="space-y-1">
+          {[
+            { color: "#7f1d1d", label: "M 7.0+" },
+            { color: "#dc2626", label: "M 6.0 – 6.9" },
+            { color: "#f97316", label: "M 5.0 – 5.9" },
+            { color: "#eab308", label: "M 4.0 – 4.9" },
+            { color: "#84cc16", label: "M 3.0 – 3.9" },
+            { color: "#22d3ee", label: "M < 3.0" },
+          ].map((row) => (
+            <div key={row.label} className="flex items-center gap-2">
+              <span
+                className="inline-block h-3 w-3 rounded-full"
+                style={{ backgroundColor: row.color }}
+              />
+              <span className="text-slate-600">{row.label}</span>
+            </div>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
