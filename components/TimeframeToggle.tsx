@@ -7,37 +7,34 @@ interface Props {
   onChange: (t: Timeframe) => void;
 }
 
-const OPTIONS: { key: Timeframe; label: string; sub: string }[] = [
-  { key: "30d", label: "30 days", sub: "Recent activity" },
-  { key: "5y", label: "5 years", sub: "Recent patterns" },
-  { key: "50y", label: "50 years", sub: "Historical hotspots" },
+const OPTIONS: { key: Timeframe; label: string }[] = [
+  { key: "30d", label: "30 Days" },
+  { key: "5y", label: "5 Years" },
+  { key: "50y", label: "50 Years" },
 ];
 
 export default function TimeframeToggle({ value, onChange }: Props) {
   return (
-    <div className="absolute top-4 left-4 z-[1000] rounded-lg bg-white/95 p-1 shadow-lg backdrop-blur">
-      <div className="flex gap-1">
-        {OPTIONS.map((opt) => (
-          <button
-            key={opt.key}
-            onClick={() => onChange(opt.key)}
-            className={`rounded-md px-3 py-2 text-left transition ${
-              value === opt.key
-                ? "bg-slate-900 text-white"
-                : "text-slate-700 hover:bg-slate-100"
-            }`}
-          >
-            <div className="text-sm font-semibold">{opt.label}</div>
-            <div
-              className={`text-[10px] ${
-                value === opt.key ? "text-slate-300" : "text-slate-500"
+    <nav className="border-b border-slate-200 bg-white">
+      <div className="mx-auto flex max-w-[1400px] gap-1 px-4">
+        {OPTIONS.map((opt) => {
+          const active = value === opt.key;
+          return (
+            <button
+              key={opt.key}
+              onClick={() => onChange(opt.key)}
+              aria-current={active ? "page" : undefined}
+              className={`-mb-px border-b-[3px] px-4 py-3 text-sm font-semibold transition ${
+                active
+                  ? "border-[#ff6b00] text-[#0b3a5d]"
+                  : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800"
               }`}
             >
-              {opt.sub}
-            </div>
-          </button>
-        ))}
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
-    </div>
+    </nav>
   );
 }
